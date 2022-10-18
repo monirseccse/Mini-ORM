@@ -475,11 +475,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\Asp.net-B7\\Assignment4\\Assignment4\\Assignment4.csproj",
+      "projectUniqueName": "E:\\Mini-ORM\\Assignment4\\Assignment4\\Assignment4.csproj",
       "projectName": "Assignment4",
-      "projectPath": "E:\\Asp.net-B7\\Assignment4\\Assignment4\\Assignment4.csproj",
+      "projectPath": "E:\\Mini-ORM\\Assignment4\\Assignment4\\Assignment4.csproj",
       "packagesPath": "C:\\Users\\USER\\.nuget\\packages\\",
-      "outputPath": "E:\\Asp.net-B7\\Assignment4\\Assignment4\\obj\\",
+      "outputPath": "E:\\Mini-ORM\\Assignment4\\Assignment4\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\USER\\AppData\\Roaming\\NuGet\\NuGet.Config",

@@ -9,5 +9,7 @@ namespace Assignment4
     public interface IDataUtility
     {
        void ExecuteCommand(string command,Dictionary<string,object> parameters);
+       List<Dictionary<string, object>> DataRead(string command, Dictionary<string, object> parameters);
+    
     }
 }
