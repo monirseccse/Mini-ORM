@@ -24,9 +24,10 @@ namespace Assignment4
                 Email = "hj",
                 PresentAddress =
         new Address { Id = 1, City = "jk", Country = "jhj", Street = "ui" },
-                //  PermanentAddress=new Address{ City = "jk", Country = "jhj", Street = "ui" },
-                PhoneNumbers = new List<Phone> {new Phone {Id =1, CountryCode="hj",Extension="gh",Number="67"},
-          new Phone{ Id =2, CountryCode="abc",Extension="iop",Number="4567"} }
+                  PermanentAddress=new Address{Id=2, City = "abc", Country = "vbn", Street = "alam" },
+                PhoneNumbers = new List<Phone> {
+                    new Phone {Id =1, CountryCode="hj",Extension="gh",Number="67"},
+                  new Phone{ Id =2, CountryCode="abc",Extension="iop",Number="4567"} }
             };
             return instructor;
         }

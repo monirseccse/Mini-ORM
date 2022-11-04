@@ -30,15 +30,25 @@ namespace Assignment4
         {
             if (entity == null)
                 return;
-
+            int ck = 0;
             foreach (var cls in diclist.Item1)
             {
-                string sql = "Delete from " + diclist.Item2[ck++] + " where Id=@Id";
-                DataUtility dataUtility = new DataUtility();
-                Dictionary<string, object> dic =new Dictionary<string, object>();
-                object s = cls["Id"];
-                dic.Add("Id", cls["Id"]);
-                dataUtility.ExecuteCommand(sql, dic);
+               
+                if (!new Necessary().NoDuplicate(cls, diclist.Item2[ck]))
+                {
+                    string sql = "Delete from " + diclist.Item2[ck++] + " where Id=@Id";
+                    DataUtility dataUtility = new DataUtility();
+                    Dictionary<string, object> dic = new Dictionary<string, object>();
+                    object s = cls["Id"];
+                    dic.Add("Id", cls["Id"]);
+                    dataUtility.ExecuteCommand(sql, dic);
+                }
+                else
+                {
+                    Console.WriteLine("This object does not exist");
+                    return;
+                }
+
             }
         }
 
@@ -78,21 +88,30 @@ namespace Assignment4
         {
             foreach (var cls in diclist.Item1)
             {
-                string sql = "select * from " + diclist.Item2[ck++] + " where Id=@Id";
-                DataUtility dataUtility = new DataUtility();
-                Dictionary<string, object> dic = new Dictionary<string, object>();
-                object s = cls["Id"];
-                dic.Add("Id", cls["Id"]);
-                List<Dictionary<string, object>> list=dataUtility.DataRead(sql, dic);
-                Console.WriteLine($"Table name :{diclist.Item2[ck-1]}");
-                foreach (var item in list)
+                if (!new Necessary().NoDuplicate(cls, diclist.Item2[ck]))
                 {
-                    foreach (var v in item)
+                    string sql = "select * from " + diclist.Item2[ck++] + " where Id=@Id";
+                    DataUtility dataUtility = new DataUtility();
+                    Dictionary<string, object> dic = new Dictionary<string, object>();
+                    object s = cls["Id"];
+                    dic.Add("Id", cls["Id"]);
+                    List<Dictionary<string, object>> list = dataUtility.DataRead(sql, dic);
+                    Console.WriteLine($"Table name :{diclist.Item2[ck - 1]}");
+                    foreach (var item in list)
                     {
-                        Console.WriteLine($"{v.Key}={v.Value}");
+                        foreach (var v in item)
+                        {
+                            Console.WriteLine($"{v.Key}={v.Value}");
+                        }
                     }
+                    Console.WriteLine();
                 }
-                Console.WriteLine();
+                else
+                {
+                    Console.WriteLine("This object does not exist");
+                    return;
+                }
+
             }
          
         }
@@ -101,11 +120,16 @@ namespace Assignment4
         {
             if (entity == null)
                 return;
+            if(diclist.Item1==null && diclist.Item1 == null)
+            {
+                Console.WriteLine("Please Check Foreign Key Constraints or Others Properties");
+                return;
+            }
           
             int ck = 0;
             foreach (var cls in diclist.Item1)
             {
-                if(new Necessary().NoDuplicate(cls,diclist.Item2[ck+1]))
+                if(new Necessary().NoDuplicate(cls,diclist.Item2[ck]))
                 {
                     string s1 = "", s2 = ""; bool flag = false;
                     foreach (var item in cls)
@@ -123,6 +147,7 @@ namespace Assignment4
                 }
                 else
                 {
+                    ck++;
                     Console.WriteLine("This Id already exists");
                 }
                
@@ -140,19 +165,27 @@ namespace Assignment4
           
             foreach (var cls in diclist.Item1)
             {
-                string s1 = " set "; bool flag = false;
-                foreach (var item in cls)
+                if (!new Necessary().NoDuplicate(cls, diclist.Item2[ck]))
                 {
+                    string s1 = " set "; bool flag = false;
+                    foreach (var item in cls)
+                    {
 
-                    if (!flag) flag = true;
-                    else { s1 += ","; }
-                    s1 += item.Key+ "=@" + item.Key;
-                    
+                        if (!flag) flag = true;
+                        else { s1 += ","; }
+                        s1 += item.Key + "=@" + item.Key;
+
+                    }
+                    string sql = "Update " + diclist.Item2[ck++] + s1;
+                    DataUtility dataUtility = new DataUtility();
+                    dataUtility.ExecuteCommand(sql, cls);
                 }
-
-                string sql = "Update " + diclist.Item2[ck++] + s1 ;
-                DataUtility dataUtility = new DataUtility();
-                dataUtility.ExecuteCommand(sql, cls);
+                else
+                {
+                    Console.WriteLine("This object does not exist");
+                    return;
+                }
+                
             }
         }
     }

@@ -13,10 +13,16 @@ namespace Assignment4
         private List<Dictionary<string, object>> _lists;
         private List<string> _className;
         private Dictionary<string, object> _dic;
+        Dictionary<string,(string parentname,object parentId)> _dic2;
+        object _listforeignkeyId = null;
+        bool listflag;
         public Necessary()
         {
             _lists = new List<Dictionary<string, object>>();
+            _dic2 = new Dictionary<string, (string parentname, object parentId)>();
             _className = new List<string>();
+            _listforeignkeyId = null;
+            listflag = false;
         }
         public  Type TypeGetting<T>(T obj)
         {
@@ -31,38 +37,74 @@ namespace Assignment4
 
             Type type = entity.GetType();
             _className.Add(type.Name);
+            
             if(!_lists.Contains(_dic)&&_dic?.Count>0)
             {
                 _lists.Add(_dic);
             }
-            _dic = new Dictionary<string, object>();
+            _dic = new Dictionary<string, object>();bool flag = false;
             PropertyInfo[] propertyInfos = type.GetProperties();
 
             foreach (var item in propertyInfos)
                 {
+                   if(item.Name.Equals("Id"))
+                  {
+                    _listforeignkeyId = item.GetValue(entity);
+                  }
+                   if(_dic2.ContainsKey(type.Name)&&!flag)
+                 {
+                    flag = true;
+                    _dic.Add(_dic2[type.Name].parentname+"Id", _dic2[type.Name].parentId);
+                 }
                   if (CheckDataTypeForQuotation(item.PropertyType))
-                     {
+                   {
                             _dic.Add(item.Name, item.GetValue(entity));
+                   }
+                   //ForeignKeyValue for Parent class 
+                     else if (!item.PropertyType.IsGenericType &&!item.PropertyType.IsArray)
+                     {
+                                if(item.GetValue(entity)!=null)
+                            {
+                                object _foreignkey = GetObjForeignKeyvalue(item.GetValue(entity));
+                                _dic.Add(item.Name + "Id", _foreignkey);
+                            }
+                            else
+                            {
+                                return(null,null);
+                            }
                      }
+                   else if(item.PropertyType.IsGenericType||item.PropertyType.IsArray)
+                {
+                    Type type1 = item.PropertyType.GetGenericArguments()[0];
+                    _dic2.Add(type1.Name, (type.Name,_listforeignkeyId));
+                   }
+                    
+
                 }
             foreach (var item in propertyInfos)
             {
                 Type type1 = item.PropertyType;
                 if (type1.IsGenericType || type1.IsArray)
                 {
+                  
                     IEnumerable<object> list = (IEnumerable<object>)item.GetValue(entity);
-
+                    
                     foreach (var obj in list)
                     {
+                        listflag = true;
+                       
                         ObjectInitialiseForReflection(obj);
-                    }
+                     }
+                    
+                    listflag = false;
                 }
 
                else if (!CheckDataTypeForQuotation(item.PropertyType))
                 {
                       if (item.GetValue(entity) != null)
                     {
-                        ObjectInitialiseForReflection(entity);
+                        ObjectInitialiseForReflection(item.GetValue(entity));
+                        
                     }
                 }
             }
@@ -72,6 +114,24 @@ namespace Assignment4
             }
             return (_lists,_className);
         }
+
+        private object GetObjForeignKeyvalue(object entity)
+        {
+            Type type = entity.GetType();
+            PropertyInfo[] propertyInfos = type.GetProperties();
+           object obj = null;
+            foreach (var item in propertyInfos)
+            {
+                  if (item.Name.Equals("Id"))
+                    {
+                    obj = item.GetValue(entity);
+                    return obj;
+                }
+
+            }
+            return obj;
+        }
+
         private static bool CheckDataTypeForQuotation(Type propertyType)
         {
             if (
@@ -115,7 +175,7 @@ namespace Assignment4
             dic.Add("Id", cls["Id"]);
             List<Dictionary<string, object>> list = dataUtility.DataRead(sql, dic);
 
-            return list.Count>0?true:false;
+            return list.Count==0;
         }
     }
 }
